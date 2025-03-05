@@ -4,8 +4,6 @@ const app = express();
 app.use(express.text());
 
 app.post("/webhook", (req: Request, res: Response) => {
-  console.log("Received Body:", req.body);
-
   const regex = /row=(\d+) column=(\d+): (\S)/g;
   let matches;
   let entries: { row: number; col: number; char: string }[] = [];
