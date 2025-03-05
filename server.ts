@@ -1,41 +1,33 @@
 import express, { Request, Response } from "express";
 
 const app = express();
-
-// Middleware
-app.use(express.json());
 app.use(express.text());
-app.use(express.urlencoded({ extended: true }));
 
-// Webhook
 app.post("/webhook", (req: Request, res: Response) => {
-  console.log("Received Headers:", req.headers);
   console.log("Received Body:", req.body);
 
-  let secretMessage = "";
+  const regex = /row=(\d+) column=(\d+): (\S)/g;
+  let matches;
+  let entries: { row: number; col: number; char: string }[] = [];
 
-  try {
-    if (typeof req.body === "object" && req.body !== null) {
-      secretMessage =
-        req.body.secretCode || req.body.message || req.body.secret || "";
-    } else if (typeof req.body === "string" && req.body.trim() !== "") {
-      const parsedBody = JSON.parse(req.body);
-      secretMessage =
-        parsedBody.secretCode || parsedBody.message || parsedBody.secret || "";
-    }
-  } catch (error) {
-    console.error("Error parsing request body:", error);
+  // Extract row, column, and character
+  while ((matches = regex.exec(req.body)) !== null) {
+    entries.push({
+      row: parseInt(matches[1], 10),
+      col: parseInt(matches[2], 10),
+      char: matches[3],
+    });
   }
 
-  if (!secretMessage) {
-    console.warn("No secret message found in the payload!");
-  } else {
-    console.log("Extracted Secret Code:", secretMessage);
-  }
+  // Sort first by row, then by column
+  entries.sort((a, b) => a.row - b.row || a.col - b.col);
+
+  const secretMessage = entries.map((entry) => entry.char).join("");
+
+  console.log("Extracted Secret Code:", secretMessage);
 
   res.status(200).json({ message: "Webhook received successfully" });
 });
 
-// Start the server
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
