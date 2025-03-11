@@ -13,8 +13,8 @@ This is a **Node.js & TypeScript** webhook service that receives encoded payload
 
 ### 1. **Clone the Repository**
 ```bash
-git clone https://github.com/YOUR-USERNAME/YOUR-REPO.git
-cd YOUR-REPO
+git clone https://github.com/DarkNight918/ksense-test.git
+cd ksense-test
 ```
 
 ### 2. **Install Dependencies**
